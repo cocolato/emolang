@@ -1,5 +1,9 @@
 # Emolang
 
+emoji lang in development
+
+
+
 ```
 💬 [1, 2, 3]
 
@@ -25,3 +29,5 @@
 ➕➕ "c"
 ```
 
+## Run result:
+![Alt text](image.png)
