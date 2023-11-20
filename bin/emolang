@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+# typed: true
+
+$: << 'lib'
+require 'emolang'
+
+parser = Emolang::Parser.new(ARGV[0])
+
+parser.execute

@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 # typed: true
 
+BLOCK_BEGIN = '▶️'
+BLOCK_END = '⏹️'
+
 module Emolang
 
     class TOKEN_T
@@ -9,7 +12,6 @@ module Emolang
 
       IDENT = 'IDENT'
       INT = 'INT'
-
       ASSIGN = '='
       PLUS = '+'
 
