@@ -1,20 +1,20 @@
 # frozen_string_literal: true
 # typed: true
 
-
 module Emolang
-
   module StdLib
-  include Kernel
-    def 💬(obj)
-      p obj
+    include Kernel
+
+    # rubocop:disable all
+    def 💬(other)
+      p other
     end
 
     def ❓(expr, &blk)
       blk.call if expr
     end
 
-    def ✅ 
+    def ✅
       true
     end
 
@@ -27,5 +27,7 @@ module Emolang
         body.call(*args)
       end
     end
+
+    # rubocop:enable all
   end
 end

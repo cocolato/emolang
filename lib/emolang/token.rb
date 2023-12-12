@@ -5,41 +5,37 @@ BLOCK_BEGIN = '▶️'
 BLOCK_END = '⏹️'
 
 module Emolang
+  class TokenTypeEnum
+    ILLEGAL = 'ILLEGAL'
+    EOF = 'EOF'
 
-    class TOKEN_T
-      ILLEGAL = 'ILLEGAL'
-      EOF = 'EOF'
+    IDENT = 'IDENT'
+    INT = 'INT'
+    ASSIGN = '='
+    PLUS = '+'
 
-      IDENT = 'IDENT'
-      INT = 'INT'
-      ASSIGN = '='
-      PLUS = '+'
+    COMMA = ','
 
-      COMMA = ','
+    LPAREN = '('
+    RPAREN = ')'
 
-      LPAREN = '('
-      RPAREN = ')'
+    LBRACE = '{'
+    RBRACE = '}'
 
-      LBRACE = '{'
-      RBRACE = '}'
+    FUNCTION = 'FUNCTION'
 
-      FUNCTION = 'FUNCTION'
+    LET = 'LET'
+  end
 
-      LET = 'LET'
+  class Token
+    extend T::Sig
+
+    attr_accessor :type, :literal
+
+    sig { params(type: String, literal: T.any(String, Integer)).void }
+    def initialize(type, literal)
+      @type = type
+      @literal = literal
     end
-
-
-    class Token
-      extend T::Sig
-
-      attr_accessor :type, :literal
-      
-      sig {params(type: String, literal: String).void}
-      def initialize(type, literal)
-        @type = type
-        @literal = literal
-      end
-    
-    end
+  end
 end
-

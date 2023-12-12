@@ -30,4 +30,4 @@ emoji lang in development
 ```
 
 ## Run result:
-![Alt text](image.png)
+![Alt text](/static/image.png)

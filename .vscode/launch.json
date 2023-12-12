@@ -5,6 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "ruby_lsp",
+            "request": "launch",
+            "name": "Debug program",
+            "program": "ruby "
+        },
+        {
             "type": "rdbg",
             "name": "Debug current file with rdbg",
             "request": "launch",

@@ -1,22 +1,22 @@
 # frozen_string_literal: true
 # typed: true
 
-require "minitest/autorun"
+require 'minitest/autorun'
 
-require "emolang"
- 
+require 'emolang'
+
 class TestToken < Minitest::Test
   def test_next_token
     input = '=+(){},'
 
     tests = [
-      [Emolang::TOKEN_T::ASSIGN, '='],
-      [Emolang::TOKEN_T::PLUS, '+'],
-      [Emolang::TOKEN_T::LPAREN, '('],
-      [Emolang::TOKEN_T::RPAREN, ')'],
-      [Emolang::TOKEN_T::LBRACE, '{'],
-      [Emolang::TOKEN_T::RBRACE, '}'],
-      [Emolang::TOKEN_T::COMMA, ',']
+      [Emolang::TokenTypeEnum::ASSIGN, '='],
+      [Emolang::TokenTypeEnum::PLUS, '+'],
+      [Emolang::TokenTypeEnum::LPAREN, '('],
+      [Emolang::TokenTypeEnum::RPAREN, ')'],
+      [Emolang::TokenTypeEnum::LBRACE, '{'],
+      [Emolang::TokenTypeEnum::RBRACE, '}'],
+      [Emolang::TokenTypeEnum::COMMA, ',']
     ]
 
     lexer = Emolang::Lexer.new(input)
@@ -24,9 +24,6 @@ class TestToken < Minitest::Test
       token = lexer.next_token
       assert_equal(test[0], token.type)
       assert_equal(test[1], token.literal)
-      
     end
   end
-
- 
 end
