@@ -13,6 +13,16 @@ module Emolang
     INT = 'INT'
     ASSIGN = '='
     PLUS = '+'
+    MINUS = '-'
+    ASTERISK = '*'
+    MOD = '%'
+    SLASH = '/'
+
+    BANG = '!'
+    PIPE = '|'
+
+    LT = '<'
+    GT = '>'
 
     COMMA = ','
 
@@ -22,9 +32,18 @@ module Emolang
     LBRACE = '{'
     RBRACE = '}'
 
-    FUNCTION = 'FUNCTION'
+    SEMICOLON = ';'
 
+    EQ = '=='
+    NEQ = '!='
+
+    FUNCTION = 'FUNCTION'
     LET = 'LET'
+    TRUE = 'TRUE'
+    FALSE = 'FALSE'
+    IF = 'IF'
+    ELSE = 'ELSE'
+    RETURN = 'RETURN'
   end
 
   class Token

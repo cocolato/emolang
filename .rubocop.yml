@@ -4,6 +4,9 @@ Layout/MethodLength:
 Metrics/CyclomaticComplexity:
   Max: 10
 
+Metrics/ClassLength:
+  Max: 300
+
 Layout/Documentation:
   Enabled: false
 

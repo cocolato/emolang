@@ -11,10 +11,13 @@ module Emolang
     class << self
       # rubocop:disable Style/ClassVars
       @@keywords = {
-        '👴' => Emolang::TokenTypeEnum,
         'let' => Emolang::TokenTypeEnum::LET,
-        '🧮' => Emolang::TokenTypeEnum::FUNCTION,
-        'func' => Emolang::TokenTypeEnum::FUNCTION
+        'func' => Emolang::TokenTypeEnum::FUNCTION,
+        'if' => Emolang::TokenTypeEnum::IF,
+        'else' => Emolang::TokenTypeEnum::ELSE,
+        'true' => Emolang::TokenTypeEnum::TRUE,
+        'false' => Emolang::TokenTypeEnum::FALSE,
+        'return' => Emolang::TokenTypeEnum::RETURN
       }
       # rubocop:enable Style/ClassVars
     end
@@ -38,9 +41,18 @@ module Emolang
       @read_pos += 1
     end
 
+    sig { returns(String) }
+    def peek_char
+      if @read_pos >= @input.length
+        '\0'
+      else
+        T.must(@input[@read_pos])
+      end
+    end
+
     sig { returns(Emolang::Token) }
     def next_token
-      read_char until (@ch =~ /\s/).nil?
+      read_char until (@ch =~ /\s/).nil? || @ch == '\0'
 
       if (token = pattern_match(@ch)).nil?
         if letter? @ch
@@ -57,11 +69,17 @@ module Emolang
       token
     end
 
+    # rubocop:disable Metrics
     sig { params(char: String).returns(T.nilable(Emolang::Token)) }
     def pattern_match(char)
       case char
       when '='
-        Emolang::Token.new(Emolang::TokenTypeEnum::ASSIGN, char)
+        if peek_char == '='
+          read_char
+          Emolang::Token.new(Emolang::TokenTypeEnum::EQ, '==')
+        else
+          Emolang::Token.new(Emolang::TokenTypeEnum::ASSIGN, char)
+        end
       when '('
         Emolang::Token.new(Emolang::TokenTypeEnum::LPAREN, char)
       when ')'
@@ -74,19 +92,43 @@ module Emolang
         Emolang::Token.new(Emolang::TokenTypeEnum::COMMA, char)
       when '+'
         Emolang::Token.new(Emolang::TokenTypeEnum::PLUS, char)
+      when '-'
+        Emolang::Token.new(Emolang::TokenTypeEnum::MINUS, char)
+      when '*'
+        Emolang::Token.new(Emolang::TokenTypeEnum::ASTERISK, char)
+      when '/'
+        Emolang::Token.new(Emolang::TokenTypeEnum::SLASH, char)
+      when '%'
+        Emolang::Token.new(Emolang::TokenTypeEnum::MOD, char)
+      when '>'
+        Emolang::Token.new(Emolang::TokenTypeEnum::GT, char)
+      when '<'
+        Emolang::Token.new(Emolang::TokenTypeEnum::LT, char)
+      when '!'
+        if peek_char == '='
+          read_char
+          Emolang::Token.new(Emolang::TokenTypeEnum::NEQ, '!=')
+        else
+          Emolang::Token.new(Emolang::TokenTypeEnum::BANG, char)
+        end
+      when '|'
+        Emolang::Token.new(Emolang::TokenTypeEnum::PIPE, char)
+      when ';'
+        Emolang::Token.new(Emolang::TokenTypeEnum::SEMICOLON, char)
       when '\0'
         Emolang::Token.new(Emolang::TokenTypeEnum::EOF, char)
       end
     end
+    # rubocop:enable Metrics
 
     sig { params(char: String).returns(T::Boolean) }
     def letter?(char)
-      !(char =~ /[a-zA-Z_:👴🧮]/).nil?
+      !(char =~ /[a-zA-Z_:👴🧮]/).nil? and char != '\0'
     end
 
     sig { params(char: String).returns(T::Boolean) }
     def digit?(char)
-      !(char =~ /[0-9]/).nil?
+      !(char =~ /[0-9]/).nil? and char != '\0'
     end
 
     sig { returns(String) }
