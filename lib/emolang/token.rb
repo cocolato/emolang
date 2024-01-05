@@ -37,6 +37,8 @@ module Emolang
     EQ = '=='
     NEQ = '!='
 
+    NIL = 'nil'
+
     FUNCTION = 'FUNCTION'
     LET = 'LET'
     TRUE = 'TRUE'
