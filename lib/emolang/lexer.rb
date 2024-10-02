@@ -9,7 +9,6 @@ module Emolang
     extend T::Sig
 
     class << self
-      # rubocop:disable Style/ClassVars
       @@keywords = {
         'let' => Emolang::TokenTypeEnum::LET,
         'func' => Emolang::TokenTypeEnum::FUNCTION,
@@ -19,15 +18,14 @@ module Emolang
         'false' => Emolang::TokenTypeEnum::FALSE,
         'return' => Emolang::TokenTypeEnum::RETURN
       }
-      # rubocop:enable Style/ClassVars
     end
 
-    attr_accessor :input, :position, :read_pos, :ch
+    attr_accessor :input, :position, :next_pos, :ch
 
     sig { params(input: String).void }
     def initialize(input)
       @input = T.let(input, String)
-      @read_pos = T.let(0, Integer)
+      @next_pos = T.let(0, Integer)
       @position = T.let(0, Integer)
       @ch = T.let('', String)
       read_char
@@ -35,18 +33,18 @@ module Emolang
 
     sig { void }
     def read_char
-      @position = @read_pos
-      @ch = @read_pos >= @input.length ? '\0' : T.must(@input[@read_pos])
+      @position = @next_pos
+      @ch = @next_pos >= @input.length ? '\0' : T.must(@input[@next_pos])
 
-      @read_pos += 1
+      @next_pos += 1
     end
 
     sig { returns(String) }
     def peek_char
-      if @read_pos >= @input.length
+      if @next_pos >= @input.length
         '\0'
       else
-        T.must(@input[@read_pos])
+        T.must(@input[@next_pos])
       end
     end
 

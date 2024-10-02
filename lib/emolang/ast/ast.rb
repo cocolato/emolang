@@ -1,33 +1,14 @@
 # frozen_string_literal: true
 # typed: true
 
-require_relative 'token'
+require_relative '../token'
+require_relative 'node'
 
 module Emolang
   module AST
-    class Node
-      extend T::Sig
-    end
-
-    class Program < Node
-      attr_accessor :statements
-
-      sig { void }
-      def initialize
-        super
-        @statements = T.let([], Array)
-      end
-
-      sig { returns(String) }
-      def token_literal
-        @statements.map(&:token_literal).join
-      end
-    end
-
     class Statement < Node
-      sig { returns(String) }
       def statement_name
-        @name
+        raise NotImplementedError
       end
     end
 

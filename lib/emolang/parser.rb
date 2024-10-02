@@ -4,7 +4,7 @@
 require_relative 'stdlib'
 require_relative 'token'
 require_relative 'lexer'
-require_relative 'ast'
+require_relative 'ast/ast'
 
 module Emolang
   class Parser
@@ -26,10 +26,13 @@ module Emolang
 
   class EParser
     extend T::Sig
+    attr_accessor :errors
+
     def initialize(lexer)
       @l = T.let(lexer, Lexer)
       @cur_token = T.let(Token.new(TokenTypeEnum::NIL, ''), Token)
       @peek_token = T.let(Token.new(TokenTypeEnum::NIL, ''), Token)
+      @errors = T.let([], T::Array[String])
       next_token
       next_token
     end
@@ -82,19 +85,26 @@ module Emolang
       stmt
     end
 
+    sig { params(type: String).returns(T::Boolean) }
     def expect_peek(type)
-      return false unless peek_token_is type
-
-      next_token
-      true
+      if @peek_token.type == type
+        next_token
+        true
+      else
+        peek_error type
+        false
+      end
     end
 
-    def peek_token_is(type)
-      @peek_token.type == type
-    end
-
+    sig { params(type: String).void }
     def cur_token_is(type)
       @cur_token == type
+    end
+
+    sig { params(type: String).void }
+    def peek_error(type)
+      err_msg = "expected next token to be #{type}, got #{@peek_token.type} instead"
+      @errors << err_msg
     end
   end
 end

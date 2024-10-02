@@ -1,4 +1,7 @@
-Layout/MethodLength:
+AllCops:
+  NewCops: enable
+
+Metrics/MethodLength:
   Max: 20
 
 Metrics/CyclomaticComplexity:
@@ -7,7 +10,10 @@ Metrics/CyclomaticComplexity:
 Metrics/ClassLength:
   Max: 300
 
-Layout/Documentation:
+Style/Documentation:
+  Enabled: false
+
+Style/ClassVars:
   Enabled: false
 
 Gemspec/RequiredRubyVersion:
