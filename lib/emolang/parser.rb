@@ -63,10 +63,24 @@ module Emolang
 
       when TokenTypeEnum::LET
         parse_let_statement
+      when TokenTypeEnum::RETURN
+        parse_return_statement
       end
     end
 
-    sig { returns(T.nilable(AST::Statement)) }
+    sig { returns(T.nilable(AST::ReturnStatement)) }
+    def parse_return_statement
+      stmt = AST::ReturnStatement.new(@cur_token)
+      next_token
+      loop do
+        break if @cur_token.type == TokenTypeEnum::SEMICOLON
+
+        next_token
+      end
+      stmt
+    end
+
+    sig { returns(T.nilable(AST::LetStatement)) }
     def parse_let_statement
       stmt = AST::LetStatement.new(@cur_token)
 

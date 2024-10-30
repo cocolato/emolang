@@ -26,4 +26,12 @@ class TestToken < Minitest::Test
       assert_equal(test[1], token.literal)
     end
   end
+
+  def test_parse_let
+    input = 'let a = 1;'
+    lexer = Emolang::Lexer.new(input)
+    parser = Emolang::EParser.new(lexer)
+    parser.parse_program
+    assert_equal(parser.errors, [])
+  end
 end

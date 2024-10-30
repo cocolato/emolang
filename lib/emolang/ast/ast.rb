@@ -7,19 +7,10 @@ require_relative 'node'
 module Emolang
   module AST
     class Statement < Node
+      attr_accessor :token
+
       def statement_name
         raise NotImplementedError
-      end
-    end
-
-    class LetStatement < Statement
-      attr_accessor :token, :name
-
-      sig { params(token: Token).void }
-      def initialize(token)
-        super()
-        @token = token
-        @name = T.let(nil, T.nilable(AST::Identifier))
       end
 
       sig { returns(String) }
