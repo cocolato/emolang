@@ -113,7 +113,7 @@ module Emolang
         Emolang::Token.new(Emolang::TokenTypeEnum::PIPE, char)
       when ';'
         Emolang::Token.new(Emolang::TokenTypeEnum::SEMICOLON, char)
-      when "\u0000"
+      when '\u0000'
         Emolang::Token.new(Emolang::TokenTypeEnum::EOF, char)
       when '\0'
         Emolang::Token.new(Emolang::TokenTypeEnum::EOF, char)

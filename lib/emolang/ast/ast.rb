@@ -19,7 +19,13 @@ module Emolang
       end
     end
 
-    class Identifier < Node
+    class Expression < Node
+      def expression_node
+        raise NotImplementedError
+      end
+    end
+
+    class Identifier < Expression
       sig { params(token: Token, value: String).void }
       def initialize(token, value)
         super()
@@ -30,12 +36,6 @@ module Emolang
       sig { returns(String) }
       def token_literal
         @token.literal
-      end
-    end
-
-    class Expression < Node
-      def expression_node
-        nil
       end
     end
   end

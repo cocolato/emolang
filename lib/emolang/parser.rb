@@ -65,7 +65,14 @@ module Emolang
         parse_let_statement
       when TokenTypeEnum::RETURN
         parse_return_statement
+      when TokenTypeEnum::IF
+        parse_if_statement
       end
+    end
+
+    sig { returns(T.nilable(AST::IfStatement)) }
+    def parse_if_statement
+      AST::IfStatement.new(@cur_token)
     end
 
     sig { returns(T.nilable(AST::ReturnStatement)) }
@@ -111,7 +118,7 @@ module Emolang
     end
 
     sig { params(type: String).void }
-    def cur_token_is(type)
+    def cur_token_is?(type)
       @cur_token == type
     end
 
