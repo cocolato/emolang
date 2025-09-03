@@ -10,3 +10,5 @@
 test.rb
 /my
 /vendor
+.rbenv*
+.vscode/
