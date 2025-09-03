@@ -12,3 +12,4 @@ test.rb
 /vendor
 .rbenv*
 .vscode/
+.ruby-version
