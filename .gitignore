@@ -13,3 +13,4 @@ test.rb
 .rbenv*
 .vscode/
 .ruby-version
+*.lock
