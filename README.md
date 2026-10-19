@@ -1,117 +1,87 @@
 # Emolang
 
-用 emoji 写代码的玩具语言：Ruby 实现的 tree-walking 解释器，架构参考 Monkey 语言（*Writing an Interpreter in Go*），并带一层 Lisp 能力（引用 / 准引用 / eval / apply / 宏）。
+English | [简体中文](README.zh-CN.md)
 
-## 快速开始
+A toy emoji language written in Ruby, with closures, recursion, and Lisp-style macros.
 
-```shell
-$ bundle install
-$ bin/emolang test/demo.emo   # 运行程序
-$ bin/emolang                 # REPL（exit 或 Ctrl-D 退出）
+## Quick start
+
+Requires Ruby 3.0+.
+
+```sh
+bundle install
+bin/emolang test/demo.emo   # Run a file
+bin/emolang                 # Start the REPL; exit or Ctrl-D to quit
 ```
-
-## 语言一览
-
-| 语法 | 含义 |
-|------|------|
-| `📦 x = 5` | 变量绑定 |
-| `↩️ expr` | 返回 |
-| `💬 expr` | 打印（也可出现在表达式位置，供宏使用） |
-| `❓ cond ▶️ ... ⏹️` | if |
-| `❓ cond ▶️ ... ⏹️ ❗ ...` | if / else（else 支持紧凑表达式或 `▶️...⏹️` 块） |
-| `🔁 cond ▶️ ... ⏹️`、`🛑` | while 循环、break |
-| `✅` / `❎` | true / false |
-| `🧮 name \|a, b\| ▶️ ... ⏹️` | 命名函数（`📦 name = ...` 的糖） |
-| `🧮 \|x\| ... ⏹️`、`🧮 \|x\| expr` | 匿名函数：块体或紧凑体 |
-| `name(args)` | 调用 |
-| `💭 ...` | 行注释（前面需留空白） |
-| `"a#{x}b"` | 字符串（支持插值与 `\"` `\\` `\n` `\t`） |
-| `[1, 2]`、`xs[0]` | 数组字面量与索引 |
-| `42`、`3.14` | 整数与浮点数字面量 |
-
-运算符（ASCII 与数学符号等价，参考 Julia）：
-
-| ASCII | 数学符号 | 优先级（低→高） |
-|---|---|---|
-| `\|\|` | | 最低 |
-| `&&` | | |
-| `==` `!=` | `≠` | |
-| `<` `>` `<=` `>=` | `≤` `≥` | |
-| `+` `-` | | |
-| `*` `/` `%` | `×` `÷` | |
-| `**`（右结合） | | |
-| `!` `-` `√`（前缀） | | |
-
-- `&&`/`||` 短路求值，结果为布尔值
-- 求值遇错立即停止；嵌套表达式中的 `↩️` / `🛑` 分别退出当前函数 / 循环
-- 不支持复数；产生复数的幂运算返回语言错误
-- 换行分隔语句；`▶️` / `⏹️` 包裹块（`▶️ 1 ⏹️` 单行块也合法）
-- 闭包、递归；块隐式返回最后一条语句的值
-- `∅` 表示 null；除 `❎` 与 `∅` 外一切值为真（包括 `0`）
-- `▶️` 后的变体选择符（U+FE0F）可有可无：`▶` 与 `▶️` 等价
 
 ```text
-📦 fib = 🧮 |n| ↩️ ❓ n < 2 ▶️ n ⏹️ ❗ fib(n - 1) + fib(n - 2)
-
-💬 fib(10)        💭 55
+🧮 fib |n| ↩️ ❓ n < 2 ▶️ n ⏹️ ❗ fib(n - 1) + fib(n - 2)
+💬 fib(10)   💭 55
 ```
 
-## Lisp 层
+## Syntax
 
-代码即数据。符号用 `🔖name`（书签 = 标签，如 `🔖+`、`🔖if`）；引用产生的"数据语言"是带标签的数组：
+| Syntax | Meaning |
+|---|---|
+| `📦 x = 5` | Bind a variable |
+| `💬 x` / `↩️ x` | Print / return |
+| `✅` / `❎` | True / false |
+| `❓ cond ▶️ a ⏹️ ❗ b` | If / else; else accepts an expression or a block |
+| `🔁 cond ▶️ ... ⏹️` / `🛑` | While / break |
+| `🧮 add \|a, b\| a + b` | Named function |
+| `🧮 \|x\| x * x` | Anonymous function |
+| `add(1, 2)` | Call |
+| `[1, 2]` / `xs[0]` | Array / index |
+| `"hello #{name}"` | String interpolation |
+| `💭 comment` | Line comment; leave whitespace before it |
+
+Newlines separate statements. Blocks use `▶️ ... ⏹️` and return their last value.
+Numbers include integers and floats. Only false and null (displayed as `∅`) are falsey.
+Errors stop evaluation; complex numbers are unsupported.
+
+Operators, from low to high precedence:
+`||`, `&&`, `== !=`, `< > <= >=`, `+ -`, `* / %`, `**`, then prefix `! - √`.
+`**` associates right; `&&` and `||` short-circuit and return booleans.
+Math aliases: `≤ ≥ ≠ × ÷` for `<= >= != * /`.
+
+## Quote, eval, and macros
+
+Symbols use `🔖name`. Quoted code is data; `🔮` evaluates it and `🚀` applies a function to an array of arguments.
 
 ```text
-'[🔖+, 1, 2]             # 引用：得到 [:+, 1, 2]
-📖 [1, 2, ~@xs]          # 准引用：~ 求值、~@ 展开（拼接）
-🔮('[🔖+, 1, 2])         # eval 内建：数据 → 求值 → 3
-🚀(add, [1, 2])          # apply 内建
+💬 🔮('[🔖+, 1, 2])     💭 3
+📦 xs = [3, 4]
+💬 📖 [1, 2, ~@xs]      💭 [1, 2, 3, 4]; ~ evaluates, ~@ splices
+🧮 add |a, b| a + b
+💬 🚀(add, [1, 2])      💭 3
 ```
 
-数据标签：`[:+, a, b]`（中缀）`[:!, x]`、`[:√, x]`（前缀）`[:call, f, args...]`、`[:array, ...]`、
-`[:do, stmts...]`、`[:if, cond, then, else?]`、`[:while, cond, body]`、`[:break]`、
-`[:let, :name, value]`、`[:return, v]`、`[:print, v]`、`[:fn, [:params], body]`、
-`[:macro, [:params], body]`、`[:index, l, i]`、`[:str, parts...]`、`[:quote, expr]`。
-
-宏：参数**不求值**（以数据传入），体的返回值在调用点编译回 AST 并在调用方环境求值——经典非卫生 Lisp 宏：
-
-函数和宏都严格检查参数数量，直接调用与 `🚀` apply 遵循相同规则。
+Macros receive unevaluated arguments and run the returned code in the caller's scope.
+Functions and macros require an exact argument count.
 
 ```text
-🔧 unless |cond, body| ▶️
-    ↩️ [🔖if, cond, [🔖do], [🔖do, body]]
-⏹️
-
-unless(❎ == ✅, 💬 "macro!")   # 打印 macro!
+🔧 unless |cond, body| [🔖if, cond, [🔖do], [🔖do, body]]
+unless(❎, 💬 "hello")
 ```
 
-## REPL 输入捷径（Julia 风格）
+## REPL shortcuts
 
-语言本身保持纯 emoji；REPL 里用反斜杠助记符输入，无需 emoji 输入法：
+- Type `\let`, then **Tab**, to insert `📦`.
+- `\sq` → **Tab** → `\sqrt` → **Tab** → `√`.
+- Press **Tab** twice on an ambiguous prefix such as `\s` to list candidates.
+- **Enter** also expands shortcuts. Strings and comments stay unchanged.
+- Arrow keys and **Ctrl-R** provide editing and history via Reline.
 
-- **Tab 补全**：输入完整助记符（如 `\let`）按 Tab 立即转换成 emoji（`📦`）；`\sq` 先补全为 `\sqrt`，再按 Tab 转换成 `√`；歧义前缀（如 `\s`）显示候选
-- **回车展开**：完整助记符在回车时替换为 emoji（粘贴的代码同样生效）；字符串和注释内容保持原样，未知助记符不作部分替换
-- **行编辑与历史**：由 Ruby 标准库 reline 提供（方向键、Ctrl-R 等）
+Shortcuts: `\let` `\fn` `\macro` `\if` `\else` `\while` `\break` `\ret`
+`\true` `\false` `\print` `\do` `\end` `\qq` `\quote` `\sym` `\eval` `\apply` `\cmt`
+`\le` `\ge` `\ne` `\times` `\div` `\sqrt` `\and` `\or` `\pow`.
 
-```text
->>> \let x = 1 \le 2 \and 3 \ne 4     # 回车后求值 1 ≤ 2 && 3 ≠ 4
-✅
+## Development
+
+```sh
+bundle exec rake test
+bundle exec rubocop
 ```
 
-支持的捷径：`\let` `\fn` `\macro` `\if` `\else` `\while` `\break` `\ret` `\true` `\false`
-`\print` `\do` `\end` `\qq` `\quote` `\sym` `\eval` `\apply` `\cmt`
-`\le` `\ge` `\ne` `\times` `\div` `\sqrt` `\and` `\or` `\pow`
-
-## 旧版（--legacy）
-
-v0.1 的实现把 `▶️/⏹️` 文本替换成 do/end 后直接 eval 为 Ruby，仅支持旧语法，保留作对照：
-
-```shell
-$ bin/emolang --legacy test/legacy.emo
-```
-
-## 开发
-
-```shell
-$ bundle exec rake test    # 测试
-$ bundle exec rubocop      # 静态检查
-```
+The original Ruby-eval implementation is available for comparison:
+`bin/emolang --legacy test/legacy.emo`.
