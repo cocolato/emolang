@@ -1,9 +1,22 @@
 #!/usr/bin/env ruby
-# typed: true
+# frozen_string_literal: true
 
-$: << 'lib'
+$LOAD_PATH << File.expand_path('../lib', __dir__)
 require 'emolang'
 
-parser = Emolang::Parser.new(ARGV[0])
-
-parser.execute
+if ARGV[0] == '--legacy'
+  Emolang::LegacyRunner.new(ARGV[1]).execute
+elsif ARGV.empty?
+  Emolang::REPL.new.start
+else
+  begin
+    result = Emolang.run(File.read(ARGV[0]))
+    if result.is_a?(Emolang::Obj::Error)
+      warn "💀 #{result.message}"
+      exit 1
+    end
+  rescue Emolang::Error => e
+    warn "💀 #{e.message}"
+    exit 1
+  end
+end

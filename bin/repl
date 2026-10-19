@@ -1,7 +1,0 @@
-#!/usr/bin/env ruby
-# typed: true
-
-$: << 'lib'
-require 'emolang'
-
-Emolang::REPL.new.start
